@@ -52,7 +52,13 @@ function createBoard() {
         candy.addEventListener('drop', dragDrop);
 
         // Mobil uyumluluk için touch olaylarını ekle
-        addTouchEvents(candy);
+        candy.addEventListener('touchstart', dragStart);
+        candy.addEventListener('touchend', dragEnd);
+        candy.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            dragOver(e);
+        });
+        candy.addEventListener('touchend', dragDrop);
 
         game.appendChild(candy);
         candies.push(candy);
@@ -62,77 +68,80 @@ function createBoard() {
     updateHourlyEarnings();
 }
 
-function addTouchEvents(candy) {
-    candy.addEventListener('touchstart', dragStart);
-    candy.addEventListener('touchend', dragEnd);
-    candy.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        dragOver(e);
-    });
-    candy.addEventListener('touchend', dragDrop);
+function dragStart(e) {
+    e.preventDefault();
+    if (e.touches) e = e.touches[0];
+    selectedCandy = e.target;
+    selectedIndex = candies.indexOf(selectedCandy);
+    selectedCandy.dataset.originalColor = selectedCandy.style.backgroundColor; // Orijinal rengi sakla
 }
 
-// Şekerlerin patlatılması ve düşürülmesi
-function checkMatches() {
-    let matched = false;
-    const matches = [];
+function dragEnd(e) {
+    e.preventDefault();
+    if (e.touches) e = e.touches[0];
+    if (draggedCandy && selectedCandy) {
+        const targetIndex = candies.indexOf(draggedCandy);
+        if (isValidMove(selectedIndex, targetIndex)) {
+            // Geçerli bir hareketse şekerleri yer değiştir
+            const selectedColor = selectedCandy.style.backgroundColor;
+            const targetColor = draggedCandy.style.backgroundColor;
 
-    // Satırda eşleşmeleri kontrol et
-    for (let i = 0; i < width * width; i++) {
-        const candy = candies[i];
-        const color = candy.style.backgroundColor;
+            selectedCandy.style.backgroundColor = targetColor;
+            draggedCandy.style.backgroundColor = selectedColor;
 
-        // Satırda 3 veya daha fazla eşleşme
-        if (i % width < width - 2) {
-            const match = [candy, candies[i + 1], candies[i + 2]];
-            if (match.every(c => c.style.backgroundColor === color)) {
-                matched = true;
-                matches.push(...match);
-            }
-        }
-
-        // Sütunda 3 veya daha fazla eşleşme
-        if (i < (width * (width - 2))) {
-            const match = [candy, candies[i + width], candies[i + 2 * width]];
-            if (match.every(c => c.style.backgroundColor === color)) {
-                matched = true;
-                matches.push(...match);
-            }
-        }
-    }
-
-    if (matched) {
-        // Eşleşen şekerleri patlat ve puanı artır
-        const uniqueMatches = [...new Set(matches)];
-        let matchCount = uniqueMatches.length;
-        let points = 0;
-
-        uniqueMatches.forEach(candy => {
-            candy.classList.add('burst'); // Patlayan şeker animasyonu
+            // Eşleşmeleri kontrol et
+            checkMatches();
+        } else {
+            // Geçersiz hareketse şekerleri eski haline getir
             setTimeout(() => {
-                candy.style.backgroundColor = 'white'; // Patlayan şekerleri beyaza çevir
-                candy.classList.remove('burst'); // Animasyon sınıfını kaldır
+                selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
+                draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
             }, 500);
-        });
-
-        // Her eşleşen şeker için puan ekle
-        points = matchCount;
-        score += points;
-        scoreDisplay.textContent = `Score: ${score}`;
-
-        saveGameState(); // Puan ve şeker durumunu kaydet
-
-        setTimeout(() => {
-            dropCandies(); // Patlayan şekerlerden sonra yeni şekerleri yerleştir
-            checkMatches(); // Yeni eşleşmeleri kontrol et
-        }, 500);
-    } else if (selectedCandy && draggedCandy) {
-        // Eşleşme yoksa şekerleri eski haline döndür
-        setTimeout(() => {
-            selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
-            draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
-        }, 500);
+        }
     }
+
+    selectedCandy = null;
+    draggedCandy = null;
+    selectedIndex = null;
+    draggedIndex = null;
+}
+
+function dragOver(e) {
+    e.preventDefault();
+}
+
+function dragDrop(e) {
+    e.preventDefault();
+    if (e.touches) e = e.touches[0];
+    draggedCandy = e.target;
+    draggedIndex = candies.indexOf(draggedCandy);
+
+    // Düşürme olayını işlemek için
+    if (selectedCandy && draggedCandy) {
+        const targetIndex = candies.indexOf(draggedCandy);
+        if (isValidMove(selectedIndex, targetIndex)) {
+            // Geçerli bir hareketse şekerleri yer değiştir
+            const selectedColor = selectedCandy.style.backgroundColor;
+            const targetColor = draggedCandy.style.backgroundColor;
+
+            selectedCandy.style.backgroundColor = targetColor;
+            draggedCandy.style.backgroundColor = selectedColor;
+
+            // Eşleşmeleri kontrol et
+            checkMatches();
+        } else {
+            // Geçersiz hareketse şekerleri eski haline getir
+            setTimeout(() => {
+                selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
+                draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
+            }, 500);
+        }
+    }
+
+    selectedCandy = null;
+    draggedCandy = null;
+    selectedIndex = null;
+    draggedIndex = null;
 }
 
 // Şekerlerin üstten düşmesini sağlama
@@ -171,79 +180,6 @@ function isValidMove(fromIndex, toIndex) {
 
     // Komşu hücreleri kontrol et
     return (Math.abs(fromRow - toRow) === 1 && fromCol === toCol) || (Math.abs(fromCol - toCol) === 1 && fromRow === toRow);
-}
-
-function dragStart(e) {
-    if (e.touches) e = e.touches[0];
-    selectedCandy = e.target;
-    selectedIndex = candies.indexOf(selectedCandy);
-    selectedCandy.dataset.originalColor = selectedCandy.style.backgroundColor; // Orijinal rengi sakla
-}
-
-function dragEnd(e) {
-    if (e.touches) e = e.touches[0];
-    if (draggedCandy && selectedCandy) {
-        const targetIndex = candies.indexOf(draggedCandy);
-        if (isValidMove(selectedIndex, targetIndex)) {
-            // Geçerli bir hareketse şekerleri yer değiştir
-            const selectedColor = selectedCandy.style.backgroundColor;
-            const targetColor = draggedCandy.style.backgroundColor;
-
-            selectedCandy.style.backgroundColor = targetColor;
-            draggedCandy.style.backgroundColor = selectedColor;
-
-            // Eşleşmeleri kontrol et
-            checkMatches();
-        } else {
-            // Geçersiz hareketse şekerleri eski haline getir
-            setTimeout(() => {
-                selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
-                draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
-            }, 500);
-        }
-    }
-
-    selectedCandy = null;
-    draggedCandy = null;
-    selectedIndex = null;
-    draggedIndex = null;
-}
-
-function dragOver(e) {
-    e.preventDefault();
-}
-
-function dragDrop(e) {
-    if (e.touches) e = e.touches[0];
-    draggedCandy = e.target;
-    draggedIndex = candies.indexOf(draggedCandy);
-
-    // Düşürme olayını işlemek için
-    if (selectedCandy && draggedCandy) {
-        const targetIndex = candies.indexOf(draggedCandy);
-        if (isValidMove(selectedIndex, targetIndex)) {
-            // Geçerli bir hareketse şekerleri yer değiştir
-            const selectedColor = selectedCandy.style.backgroundColor;
-            const targetColor = draggedCandy.style.backgroundColor;
-
-            selectedCandy.style.backgroundColor = targetColor;
-            draggedCandy.style.backgroundColor = selectedColor;
-
-            // Eşleşmeleri kontrol et
-            checkMatches();
-        } else {
-            // Geçersiz hareketse şekerleri eski haline getir
-            setTimeout(() => {
-                selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
-                draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
-            }, 500);
-        }
-    }
-
-    selectedCandy = null;
-    draggedCandy = null;
-    selectedIndex = null;
-    draggedIndex = null;
 }
 
 // Kazançları toplama
