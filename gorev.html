@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Görevler</title>
+    <link rel="stylesheet" href="gorev.css">
+</head>
+<body>
+    <main>
+        <h1>Görevler</h1>
+        <ul id="task-list">
+            <li data-task-id="task1">
+                <img src="youtube.png" alt="Görev 1 Fotoğrafı">
+                <span class="task-title">Görev 1</span>
+                <span class="task-points">100 Puan</span>
+                <a href="https://example.com" class="task-link" target="_blank">Göreve Git</a>
+                <input type="text" class="manual-code" placeholder="Kod yazın">
+                <button class="complete-btn">Tamamla</button>
+            </li>
+            <li data-task-id="task2">
+                <img src="example.png" alt="Görev 2 Fotoğrafı">
+                <span class="task-title">Görev 2</span>
+                <span class="task-points">150 Puan</span>
+                <a href="https://another-example.com" class="task-link" target="_blank">Göreve Git</a>
+                <input type="text" class="manual-code" placeholder="Kod yazın">
+                <button class="complete-btn">Tamamla</button>
+            </li>
+            <!-- Diğer görevler burada yer alacak -->
+        </ul>
+        
+    <footer>
+        <div class="nav-container">
+            <button onclick="location.href='index.html'" class="nav-button">Home</button>
+            <button onclick="location.href='gorev.html'" class="nav-button">Görev</button>
+            <button onclick="location.href='friend.html'" class="nav-button">Frend</button>
+            <button onclick="location.href='wallet.html'" class="nav-button">Wallet</button>
+        </div>
+    </footer>
+    <script src="gorev.js"></script>
+</body>
+</html>

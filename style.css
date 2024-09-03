@@ -1,0 +1,117 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+#game-container {
+    text-align: center;
+    position: relative;
+}
+
+.logo {
+    font-size: 3em;
+    font-weight: bold;
+    color: #ff69b4;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: -webkit-linear-gradient(#ff69b4, #ff1493);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: absolute;
+    top: 10px; /* Logoyu yukarıya taşıyacak şekilde ayarlandı */
+    left: 20px;
+}
+
+.candy {
+    width: 50px;
+    height: 50px;
+    background-color: gray;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+    touch-action: manipulation; /* Dokunmatik ekranlarda hareketi yönetir */
+}
+
+#game {
+    width: 100%;
+    max-width: 400px;
+    height: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    position: relative;
+    margin-top: 100px;
+    touch-action: manipulation; /* Dokunmatik ekranlarda hareketi yönetir */
+}
+
+.candy.burst {
+    animation: burstAnimation 0.5s ease forwards;
+}
+
+@keyframes burstAnimation {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+#score, #hourly-earnings {
+    font-size: 1.5em;
+    color: #333;
+    margin-top: 10px;
+    font-family: Arial, sans-serif;
+    background-color: greenyellow;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+#collect-earnings {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+#collect-earnings:hover {
+    background-color: #45a049;
+}
+
+.footer {
+    margin-top: 20px;
+}
+
+.footer button {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.footer button:hover {
+    background-color: #0056b3;
+}

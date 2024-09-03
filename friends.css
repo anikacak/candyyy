@@ -1,0 +1,102 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+ul#friends-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul#friends-list li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: calc(100% - 22px);
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    background-color: #ffffff;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px; /* Butonlar arasında boşluk bırakmak için */
+    margin: 10px; /* Butonlar etrafında biraz boşluk */
+}
+
+.nav-button {
+    background-color: #007bff; /* Buton arka plan rengini mavi yaptık */
+    border: 2px solid #0056b3; /* Butonun etrafında koyu mavi bir kenarlık */
+    color: #fff; /* Metin rengini beyaz yaptık */
+    padding: 10px 20px;
+    margin: 0; /* Margin kaldırıldı */
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s; /* Renk değişimini daha yumuşak hale getirdik */
+    text-align: center; /* Metni ortaladık */
+}
+
+.nav-button:hover {
+    background-color: #0056b3; /* Hover durumunda arka plan rengini koyu mavi yaptık */
+    color: #fff; /* Hover durumunda metin rengini beyaz yaptık */
+}

@@ -1,0 +1,116 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff; /* Arka plan rengini beyaz yaptık */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff; /* Ana içeriğin arka plan rengini beyaz yaptık */
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333; /* Başlık rengini koyu gri yaptık */
+}
+
+ul#task-list {
+    list-style: none;
+    padding: 0;
+}
+
+ul#task-list li {
+    background-color: #f9f9f9; /* Görevlerin arka plan rengini açık gri yaptık */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+ul#task-list li img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+
+ul#task-list li.completed {
+    text-decoration: line-through;
+    background-color: #e0e0e0; /* Tamamlanmış görevlerin arka plan rengini gri yaptık */
+}
+
+ul#task-list li .task-title {
+    flex: 1;
+}
+
+ul#task-list li .task-points {
+    margin-right: 10px;
+}
+
+ul#task-list li .manual-code {
+    margin-right: 10px;
+    padding: 5px;
+    font-size: 16px;
+}
+
+ul#task-list li .complete-btn {
+    background-color: #007bff; /* Buton arka plan rengini mavi yaptık */
+    border: 2px solid #0056b3; /* Butonun etrafında koyu mavi bir kenarlık */
+    color: #fff; /* Metin rengini beyaz yaptık */
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s; /* Renk değişimini daha yumuşak hale getirdik */
+}
+
+ul#task-list li .complete-btn:hover {
+    background-color: #0056b3; /* Hover durumunda arka plan rengini koyu mavi yaptık */
+    color: #fff; /* Hover durumunda metin rengini beyaz yaptık */
+}
+
+footer {
+    background-color: #ffffff;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px; /* Butonlar arasında boşluk bırakmak için */
+    margin: 10px; /* Butonlar etrafında biraz boşluk */
+}
+
+.nav-button {
+    background-color: #007bff; /* Buton arka plan rengini mavi yaptık */
+    border: 2px solid #0056b3; /* Butonun etrafında koyu mavi bir kenarlık */
+    color: #fff; /* Metin rengini beyaz yaptık */
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s; /* Renk değişimini daha yumuşak hale getirdik */
+    text-align: center; /* Metni ortaladık */
+}
+
+.nav-button:hover {
+    background-color: #0056b3; /* Hover durumunda arka plan rengini koyu mavi yaptık */
+    color: #fff; /* Hover durumunda metin rengini beyaz yaptık */
+}
