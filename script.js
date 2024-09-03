@@ -217,18 +217,36 @@ function dragDrop(e) {
     if (e.touches) e = e.touches[0];
     draggedCandy = e.target;
     draggedIndex = candies.indexOf(draggedCandy);
+
+    // Düşürme olayını işlemek için
+    if (selectedCandy && draggedCandy) {
+        const targetIndex = candies.indexOf(draggedCandy);
+        if (isValidMove(selectedIndex, targetIndex)) {
+            // Geçerli bir hareketse şekerleri yer değiştir
+            const selectedColor = selectedCandy.style.backgroundColor;
+            const targetColor = draggedCandy.style.backgroundColor;
+
+            selectedCandy.style.backgroundColor = targetColor;
+            draggedCandy.style.backgroundColor = selectedColor;
+
+            // Eşleşmeleri kontrol et
+            checkMatches();
+        } else {
+            // Geçersiz hareketse şekerleri eski haline getir
+            setTimeout(() => {
+                selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
+                draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
+            }, 500);
+        }
+    }
+
+    selectedCandy = null;
+    draggedCandy = null;
+    selectedIndex = null;
+    draggedIndex = null;
 }
 
-// Saatlik kazanç hesaplaması
-function updateHourlyEarnings() {
-    const now = new Date();
-    const elapsedTime = now - lastCollectTime;
-    const hoursElapsed = Math.floor(elapsedTime / (1000 * 60 * 60));
-    const earnings = Math.floor(hoursElapsed / 3) * 350;
-    hourlyEarningsDisplay.textContent = `Hourly Earnings: ${earnings} Score`;
-}
-
-// Kazancı toplama işlevi
+// Kazançları toplama
 function collectEarnings() {
     const now = new Date();
     const elapsedTime = now - lastCollectTime;
