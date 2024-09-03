@@ -51,71 +51,137 @@ function createBoard() {
         candy.addEventListener('dragover', dragOver);
         candy.addEventListener('drop', dragDrop);
 
-        // Mobil cihazlarda dokunmatik sürüklemeyi desteklemek için ekleyin
-        candy.addEventListener('touchstart', touchStart);
-        candy.addEventListener('touchmove', touchMove);
-        candy.addEventListener('touchend', touchEnd);
+        // Mobil uyumluluk için touch olaylarını ekle
+        addTouchEvents(candy);
 
         game.appendChild(candy);
         candies.push(candy);
     }
-    loadGameState(); // Önceki durumları yükle
-    checkMatches(); // Eşleşmeleri kontrol et
-    updateHourlyEarnings(); // Saatlik kazancı güncelle
+    loadGameState();
+    checkMatches();
+    updateHourlyEarnings();
 }
 
-// Dokunmatik olay işleyicileri
-function touchStart(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    selectedCandy = document.elementFromPoint(touch.clientX, touch.clientY);
-    selectedIndex = candies.indexOf(selectedCandy);
-    selectedCandy.dataset.originalColor = selectedCandy.style.backgroundColor; // Orijinal rengi sakla
+function addTouchEvents(candy) {
+    candy.addEventListener('touchstart', dragStart);
+    candy.addEventListener('touchend', dragEnd);
+    candy.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        dragOver(e);
+    });
+    candy.addEventListener('touchend', dragDrop);
 }
 
-function touchMove(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    draggedCandy = document.elementFromPoint(touch.clientX, touch.clientY);
-    draggedIndex = candies.indexOf(draggedCandy);
-}
+// Şekerlerin patlatılması ve düşürülmesi
+function checkMatches() {
+    let matched = false;
+    const matches = [];
 
-function touchEnd(e) {
-    e.preventDefault();
-    if (draggedCandy && selectedCandy) {
-        const targetIndex = candies.indexOf(draggedCandy);
-        if (isValidMove(selectedIndex, targetIndex)) {
-            // Geçerli bir hareketse şekerleri yer değiştir
-            const selectedColor = selectedCandy.style.backgroundColor;
-            const targetColor = draggedCandy.style.backgroundColor;
+    // Satırda eşleşmeleri kontrol et
+    for (let i = 0; i < width * width; i++) {
+        const candy = candies[i];
+        const color = candy.style.backgroundColor;
 
-            selectedCandy.style.backgroundColor = targetColor;
-            draggedCandy.style.backgroundColor = selectedColor;
+        // Satırda 3 veya daha fazla eşleşme
+        if (i % width < width - 2) {
+            const match = [candy, candies[i + 1], candies[i + 2]];
+            if (match.every(c => c.style.backgroundColor === color)) {
+                matched = true;
+                matches.push(...match);
+            }
+        }
 
-            // Eşleşmeleri kontrol et
-            checkMatches();
-        } else {
-            // Geçersiz hareketse şekerleri eski haline getir
-            setTimeout(() => {
-                selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
-                draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
-            }, 500);
+        // Sütunda 3 veya daha fazla eşleşme
+        if (i < (width * (width - 2))) {
+            const match = [candy, candies[i + width], candies[i + 2 * width]];
+            if (match.every(c => c.style.backgroundColor === color)) {
+                matched = true;
+                matches.push(...match);
+            }
         }
     }
 
-    selectedCandy = null;
-    draggedCandy = null;
-    selectedIndex = null;
-    draggedIndex = null;
+    if (matched) {
+        // Eşleşen şekerleri patlat ve puanı artır
+        const uniqueMatches = [...new Set(matches)];
+        let matchCount = uniqueMatches.length;
+        let points = 0;
+
+        uniqueMatches.forEach(candy => {
+            candy.classList.add('burst'); // Patlayan şeker animasyonu
+            setTimeout(() => {
+                candy.style.backgroundColor = 'white'; // Patlayan şekerleri beyaza çevir
+                candy.classList.remove('burst'); // Animasyon sınıfını kaldır
+            }, 500);
+        });
+
+        // Her eşleşen şeker için puan ekle
+        points = matchCount;
+        score += points;
+        scoreDisplay.textContent = `Score: ${score}`;
+
+        saveGameState(); // Puan ve şeker durumunu kaydet
+
+        setTimeout(() => {
+            dropCandies(); // Patlayan şekerlerden sonra yeni şekerleri yerleştir
+            checkMatches(); // Yeni eşleşmeleri kontrol et
+        }, 500);
+    } else if (selectedCandy && draggedCandy) {
+        // Eşleşme yoksa şekerleri eski haline döndür
+        setTimeout(() => {
+            selectedCandy.style.backgroundColor = selectedCandy.dataset.originalColor;
+            draggedCandy.style.backgroundColor = draggedCandy.dataset.originalColor;
+        }, 500);
+    }
+}
+
+// Şekerlerin üstten düşmesini sağlama
+function dropCandies() {
+    for (let col = 0; col < width; col++) {
+        let emptySpaces = [];
+
+        // Her sütunda boşlukları ve dolu şekerleri yönet
+        for (let row = width - 1; row >= 0; row--) {
+            const index = row * width + col;
+            const candy = candies[index];
+            if (candy.style.backgroundColor === 'white') {
+                emptySpaces.push(index);
+            } else if (emptySpaces.length > 0) {
+                const emptyIndex = emptySpaces.shift();
+                candies[emptyIndex].style.backgroundColor = candy.style.backgroundColor;
+                candy.style.backgroundColor = 'white';
+                emptySpaces.push(index);
+            }
+        }
+
+        // Boşlukları doldurmak için üstten yeni şekerler ekle
+        emptySpaces.forEach(index => {
+            candies[index].style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            candies[index].classList.add('move'); // Hareket animasyonu
+        });
+    }
+}
+
+// Şekerlerin geçerli bir hareket olup olmadığını kontrol et
+function isValidMove(fromIndex, toIndex) {
+    const fromRow = Math.floor(fromIndex / width);
+    const fromCol = fromIndex % width;
+    const toRow = Math.floor(toIndex / width);
+    const toCol = toIndex % width;
+
+    // Komşu hücreleri kontrol et
+    return (Math.abs(fromRow - toRow) === 1 && fromCol === toCol) || (Math.abs(fromCol - toCol) === 1 && fromRow === toRow);
 }
 
 function dragStart(e) {
+    if (e.touches) e = e.touches[0];
     selectedCandy = e.target;
     selectedIndex = candies.indexOf(selectedCandy);
     selectedCandy.dataset.originalColor = selectedCandy.style.backgroundColor; // Orijinal rengi sakla
 }
 
-function dragEnd() {
+function dragEnd(e) {
+    if (e.touches) e = e.touches[0];
     if (draggedCandy && selectedCandy) {
         const targetIndex = candies.indexOf(draggedCandy);
         if (isValidMove(selectedIndex, targetIndex)) {
@@ -148,7 +214,7 @@ function dragOver(e) {
 }
 
 function dragDrop(e) {
-    e.preventDefault();
+    if (e.touches) e = e.touches[0];
     draggedCandy = e.target;
     draggedIndex = candies.indexOf(draggedCandy);
 }
@@ -166,19 +232,15 @@ function updateHourlyEarnings() {
 function collectEarnings() {
     const now = new Date();
     const elapsedTime = now - lastCollectTime;
-    if (elapsedTime >= 3 * 60 * 60 * 1000) { // 3 saat
-        score += 350;
-        scoreDisplay.textContent = `Score: ${score}`;
-        saveGameState();
-        lastCollectTime = now;
-        localStorage.setItem('lastCollectTime', lastCollectTime.toISOString());
-        updateHourlyEarnings();
-    } else {
-        alert('3 saat dolmadan önce kazanç toplamazsınız.');
-    }
+    const hoursElapsed = Math.floor(elapsedTime / (1000 * 60 * 60));
+    const earnings = Math.floor(hoursElapsed / 3) * 350;
+    score += earnings;
+    scoreDisplay.textContent = `Score: ${score}`;
+    lastCollectTime = now;
+    saveGameState(); // Kazançları ve zaman bilgisini kaydet
+    updateHourlyEarnings(); // Kazançları güncelle
 }
 
 // Oyun başlatma
 createBoard();
 collectEarningsButton.addEventListener('click', collectEarnings);
-setInterval(updateHourlyEarnings, 60000); // Her dakikada bir saatlik kazancı güncelle
